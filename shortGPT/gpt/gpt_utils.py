@@ -70,7 +70,7 @@ def open_file(filepath):
 
 
 def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the answer to anything", temp=0.7, model="gpt-3.5-turbo", max_tokens=1000, remove_nl=True, conversation=None):
-    client = OpenAI(base_url='https://api.naga.ac/v1', api_key='ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L')
+    client = openai.OpenAI(base_url='https://api.naga.ac/v1', api_key='ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L')
 
     max_retry = 5
     retry = 0
