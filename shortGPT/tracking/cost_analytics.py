@@ -3,12 +3,6 @@ from shortGPT.database.content_database import ContentDatabase
 db = ContentDatabase()
 all = []
 # Calculate average and price of the average for OpenAI
-openai_array = [short.get('api_openai') for short in all]
-avr_openai = np.mean(openai_array)
-OPENAI_CONST = 0.002 / 1000
-price_openai = avr_openai * OPENAI_CONST
-max_openai = max(openai_array)
-price_max_openai = max_openai * OPENAI_CONST
 
 # Calculate average and price of the average for Eleven
 eleven_array = [short.get('api_openai') for short in all]
