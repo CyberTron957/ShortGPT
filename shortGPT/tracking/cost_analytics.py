@@ -13,14 +13,6 @@ max_eleven = max(eleven_array)
 price_max_eleven = max_eleven * ELEVEN_CONST
 
 
-
-# Print results
-print("OpenAI:")
-print("- Average:", avr_openai)
-print("- Price of the average:", price_openai)
-print("- Max:", max_openai)
-print("- Price of the max:", price_max_openai)
-
 print("Eleven:")
 print("- Average:", avr_eleven)
 print("- Price of the average:", price_eleven)
