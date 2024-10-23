@@ -69,9 +69,9 @@ def open_file(filepath):
         return infile.read()
 
 
-def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the answer to anything", temp=0.7, model="gemini-1.5-pro", max_tokens=1000, remove_nl=True, conversation=None):
-    openai.api_base = "https://api.naga.ac/v1"
-    openai.api_key = "ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L"
+def gpt3Turbo_completion(chat_prompt="Give an intresting science fact", system="You are an AI that can give the answer to anything", temp=0.7, model="gemini-1.5-pro", max_tokens=1000, remove_nl=True, conversation=None):
+    client = openai.OpenAI(base_url='https://api.naga.ac/v1', api_key='ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L')
+
     max_retry = 5
     retry = 0
     while True:
@@ -83,7 +83,7 @@ def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the
                     {"role": "system", "content": system},
                     {"role": "user", "content": chat_prompt}
                 ]
-            response = openai.chat.completions.create(
+            response = client.chat.completions.create(
                 model=model,
                 messages=messages,
                 max_tokens=max_tokens,
@@ -91,7 +91,7 @@ def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the
             text = response.choices[0].message.content.strip()
             if remove_nl:
                 text = re.sub('\s+', ' ', text)
-            filename = '%s_gpt3.txt' % time()
+            filename = '%s_gpt3.txt'
             if not os.path.exists('.logs/gpt_logs'):
                 os.makedirs('.logs/gpt_logs')
             with open('.logs/gpt_logs/%s' % filename, 'w', encoding='utf-8') as outfile:
