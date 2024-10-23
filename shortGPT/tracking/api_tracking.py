@@ -37,12 +37,7 @@ class APITracker:
         return wrapper
     
 
-    def wrap_turbo(self):
-        func_name = "gpt3Turbo_completion"
-        module = __import__("gpt_utils", fromlist=["gpt3Turbo_completion"])
-        func = getattr(module, func_name)
-        wrapped_func = self.openAIWrapper(func)
-        setattr(module, func_name, wrapped_func)
+    
     
     def wrap_eleven(self):
         func_name = "generateVoice"
@@ -53,7 +48,6 @@ class APITracker:
 
     
     def initiateAPITracking(self):
-        self.wrap_turbo()
         self.wrap_eleven()
 
 
