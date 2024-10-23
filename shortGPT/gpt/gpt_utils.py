@@ -69,13 +69,35 @@ def open_file(filepath):
         return infile.read()
 
 
-def gpt3Turbo_completion(chat_prompt="Give an intresting science fact", system="You are an AI that can give the answer to anything", temp=0.7, model="gemini-1.5-pro", max_tokens=1000, remove_nl=True, conversation=None):
-    client = openai.OpenAI(base_url='https://api.naga.ac/v1', api_key='ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L')
+import requests
+import os
+import re
+from time import sleep
 
+def gpt3Turbo_completion(chat_prompt="Give an interesting science fact", 
+                         system="You are an AI that can give the answer to anything", 
+                         temp=0.7, 
+                         model="gemini-1.5-pro", 
+                         max_tokens=1000, 
+                         remove_nl=True, 
+                         conversation=None):
+    # Naga AI API Base URL and API Key
+    base_url = 'https://api.naga.ac/v1'
+    api_key = 'ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L'
+    
+    # Headers for the API request
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    }
+
+    # Set up retries
     max_retry = 5
     retry = 0
+
     while True:
         try:
+            # Prepare messages (conversation format)
             if conversation:
                 messages = conversation
             else:
@@ -83,23 +105,46 @@ def gpt3Turbo_completion(chat_prompt="Give an intresting science fact", system="
                     {"role": "system", "content": system},
                     {"role": "user", "content": chat_prompt}
                 ]
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temp)
-            text = response.choices[0].message.content.strip()
+            
+            # Prepare the API payload (check Naga's required payload structure)
+            payload = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": temp
+            }
+
+            # Send the request to Naga AI
+            response = requests.post(f"{base_url}/chat/completions", 
+                                     headers=headers, 
+                                     json=payload)
+
+            # Raise error if request fails
+            if response.status_code != 200:
+                raise Exception(f"Error code: {response.status_code} - {response.json()}")
+
+            # Extract the response text from the API response (based on Naga AI's structure)
+            text = response.json()['choices'][0]['message']['content'].strip()
+
+            # Optionally remove new lines
             if remove_nl:
-                text = re.sub('\s+', ' ', text)
-            filename = '%s_gpt3.txt'
-            if not os.path.exists('.logs/gpt_logs'):
-                os.makedirs('.logs/gpt_logs')
-            with open('.logs/gpt_logs/%s' % filename, 'w', encoding='utf-8') as outfile:
-                outfile.write(f"System prompt: ===\n{system}\n===\n"+f"Chat prompt: ===\n{chat_prompt}\n===\n" + f'RESPONSE:\n====\n{text}\n===\n')
+                text = re.sub(r'\s+', ' ', text)
+            
+            # Log the response to a file
+            filename = f'{model}_gpt3.txt'
+            log_dir = '.logs/gpt_logs'
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+            with open(f'{log_dir}/{filename}', 'w', encoding='utf-8') as outfile:
+                outfile.write(f"System prompt: ===\n{system}\n===\n"
+                              f"Chat prompt: ===\n{chat_prompt}\n===\n"
+                              f"RESPONSE:\n====\n{text}\n===\n")
+
             return text
+
         except Exception as oops:
             retry += 1
             if retry >= max_retry:
-                raise Exception("GPT3 error: %s" % oops)
-            print('Error communicating with OpenAI:', oops)
-            sleep(1)
+                raise Exception(f"Error communicating with Naga AI: {oops}")
+            print(f'Error communicating with Naga AI: {oops}')
+            sleep(1)  # Wait before retrying
