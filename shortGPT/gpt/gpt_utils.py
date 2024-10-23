@@ -69,9 +69,9 @@ def open_file(filepath):
         return infile.read()
 
 
-def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the answer to anything", temp=0.7, model="gemini-1.5-pro", max_tokens=1000, remove_nl=True, conversation=None):
-    client = openai.OpenAI(base_url='https://api.naga.ac/v1', api_key='ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L')
-
+def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the answer to anything", temp=0.7, model="gpt-3.5-turbo", max_tokens=1000, remove_nl=True, conversation=None):
+    openai.api_base = "https://api.naga.ac/v1"
+    openai.api_key = "ng-LGcMxBTm67vhTuchGZMthJ3gJxb5L"
     max_retry = 5
     retry = 0
     while True:
@@ -83,7 +83,7 @@ def gpt3Turbo_completion(chat_prompt="", system="You are an AI that can give the
                     {"role": "system", "content": system},
                     {"role": "user", "content": chat_prompt}
                 ]
-            response = client.chat.completions.create(
+            response = openai.chat.completions.create(
                 model=model,
                 messages=messages,
                 max_tokens=max_tokens,
